@@ -27,7 +27,7 @@ public Dog_Spawn(Float:position[3])
 	
 	SDKHook(monster, SDKHook_OnTakeDamage, Dog_DamageHook);
 	
-	CreateTimer(10.0, Dog_IdleThink, monster, TIMER_REPEAT | TIMER_FLAG_NO_MAPCHANGE);
+	CreateTimer(10.0, Dog_IdleThink, EntIndexToEntRef(monster), TIMER_REPEAT | TIMER_FLAG_NO_MAPCHANGE);
 	
 	SDKHook(monster, SDKHook_Touch, Dog_Touch);
 }
@@ -84,8 +84,9 @@ public Action:Dog_Touch(monster, other)
 	DogAttackThink
 	------------------------------------------------------------------------------------------
 */
-public Action:Dog_SeekThink(Handle:timer, any:monster)
+public Action:Dog_SeekThink(Handle:timer, any:monsterRef)
 {
+	new monster = EntRefToEntIndex(monsterRef);
 	if(IsValidEdict(monster) && IsValidEntity(monster))
 	{
 		decl String:tmp[32];
@@ -175,8 +176,9 @@ public Action:Dog_SeekThink(Handle:timer, any:monster)
 	DogIdleThink
 	------------------------------------------------------------------------------------------
 */
-public Action:Dog_IdleThink(Handle:timer, any:monster)
+public Action:Dog_IdleThink(Handle:timer, any:monsterRef)
 {
+	new monster = EntRefToEntIndex(monsterRef);
 	if(IsValidEntity(monster))
 	{
 		decl Float:vEntPosition[3];

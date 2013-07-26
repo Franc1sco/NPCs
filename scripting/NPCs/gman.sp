@@ -26,7 +26,7 @@ public GMan_Spawn(Float:position[3])
 
 	SDKHook(monster, SDKHook_OnTakeDamage, GManDamageHook);
 	
-	CreateTimer(10.0, GManTauntThink, monster, TIMER_REPEAT | TIMER_FLAG_NO_MAPCHANGE);
+	CreateTimer(10.0, GManTauntThink, EntIndexToEntRef(monster), TIMER_REPEAT | TIMER_FLAG_NO_MAPCHANGE);
 }
 
 /* 
@@ -34,8 +34,9 @@ public GMan_Spawn(Float:position[3])
 	GManAttackThink
 	------------------------------------------------------------------------------------------
 */
-public Action:GManSeekThink(Handle:timer, any:monster)
+public Action:GManSeekThink(Handle:timer, any:monsterRef)
 {
+	new monster = EntRefToEntIndex(monsterRef);
 	if(IsValidEntity(monster))
 	{
 		decl target;
@@ -75,8 +76,9 @@ public Action:GManSeekThink(Handle:timer, any:monster)
 	GManTauntThink
 	------------------------------------------------------------------------------------------
 */
-public Action:GManTauntThink(Handle:timer, any:monster)
+public Action:GManTauntThink(Handle:timer, any:monsterRef)
 {
+	new monster = EntRefToEntIndex(monsterRef);
 	if(IsValidEntity(monster))
 	{
 		decl Float:vEntPosition[3];
