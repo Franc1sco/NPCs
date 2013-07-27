@@ -32,7 +32,7 @@ public Barney_Spawn(Float:position[3])
 	
 	SDKHook(monster, SDKHook_OnTakeDamage, BarneyDamageHook);
 	
-	CreateTimer(10.0, BarneyIdleThink, monster, TIMER_REPEAT | TIMER_FLAG_NO_MAPCHANGE);
+	CreateTimer(10.0, BarneyIdleThink, EntIndexToEntRef(monster), TIMER_REPEAT | TIMER_FLAG_NO_MAPCHANGE);
 	
 	SDKHook(monster, SDKHook_Touch, Barney_Touch);
 }
@@ -119,8 +119,9 @@ public Action:Barney_Touch(monster, other)
 	BarneyAttackThink
 	------------------------------------------------------------------------------------------
 */
-public Action:BarneySeekThink(Handle:timer, any:monster)
+public Action:BarneySeekThink(Handle:timer, any:monsterRef)
 {
+	new monster = EntRefToEntIndex(monsterRef);
 	if(IsValidEntity(monster))
 	{
 		decl String:tmp[32];
@@ -217,8 +218,9 @@ public Action:BarneySeekThink(Handle:timer, any:monster)
 	BarneyIdleThink
 	------------------------------------------------------------------------------------------
 */
-public Action:BarneyIdleThink(Handle:timer, any:monster)
+public Action:BarneyIdleThink(Handle:timer, any:monsterRef)
 {
+	new monster = EntRefToEntIndex(monsterRef);
 	if(IsValidEntity(monster))
 	{
 		decl Float:vEntPosition[3];

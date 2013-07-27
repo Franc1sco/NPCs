@@ -28,7 +28,7 @@ public AntLionGuard_Spawn(Float:position[3])
 
 	SDKHook(monster, SDKHook_OnTakeDamage, AntlionGuardDamageHook);
 
-	CreateTimer(5.0, AntlionGuardFireThink, monster, TIMER_REPEAT | TIMER_FLAG_NO_MAPCHANGE);
+	CreateTimer(5.0, AntlionGuardFireThink, EntIndexToEntRef(monster), TIMER_REPEAT | TIMER_FLAG_NO_MAPCHANGE);
 }
 
 /* 
@@ -36,8 +36,10 @@ public AntLionGuard_Spawn(Float:position[3])
 	AntlionGuardFireThink
 	------------------------------------------------------------------------------------------
 */
-public Action:AntlionGuardFireThink(Handle:timer, any:monster)
+public Action:AntlionGuardFireThink(Handle:timer, any:monsterRef)
 {
+	new monster = EntRefToEntIndex(monsterRef);
+	
 	if (BaseNPC_IsNPC(monster) && BaseNPC_IsAlive(monster))
 	{
 		new target = BaseNPC_GetTarget(monster);
@@ -111,7 +113,7 @@ public Action:AntlionGuardFireThink(Handle:timer, any:monster)
 				CreateTimer(1.0, KillFlame, flamedata);
 				WritePackCell(flamedata, flame);
 				WritePackCell(flamedata, flame2);
-				WritePackCell(flamedata, monster);
+				WritePackCell(flamedata, EntIndexToEntRef(monster));
 				
 				IgniteEntity(target, 5.0, false, 1.5, false);
 				
@@ -135,7 +137,7 @@ public Action:KillFlame(Handle:timer, Handle:flamedata)
 	ResetPack(flamedata);
 	new ent1 = ReadPackCell(flamedata);
 	new ent2 = ReadPackCell(flamedata);
-	new monster = ReadPackCell(flamedata);
+	new monster = EntRefToEntIndex(ReadPackCell(flamedata));
 	CloseHandle(flamedata);
 	
 	new String:classname[256];
@@ -155,8 +157,10 @@ public Action:KillFlame(Handle:timer, Handle:flamedata)
 		if (StrEqual(classname, "env_steam", false))
             RemoveEntity(ent2);
     }
-	
-	SetEntityMoveType(monster, MOVETYPE_STEP);
+
+	if (IsValidEntity(monster)) {
+		SetEntityMoveType(monster, MOVETYPE_STEP);
+	}
 }
 
 /* 
@@ -164,8 +168,10 @@ public Action:KillFlame(Handle:timer, Handle:flamedata)
 	AntlionGuardSeekThink
 	------------------------------------------------------------------------------------------
 */
-public Action:AntlionGuardSeekThink(Handle:timer, any:monster)
+public Action:AntlionGuardSeekThink(Handle:timer, any:monsterRef)
 {
+	new monster = EntRefToEntIndex(monsterRef);
+	
 	if (BaseNPC_IsNPC(monster) && BaseNPC_IsAlive(monster))
 	{
 		new target = BaseNPC_GetTarget(monster);

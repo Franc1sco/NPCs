@@ -34,8 +34,9 @@ public HeadCrab_Spawn(Float:position[3])
 	HeadCrabSeekThink
 	------------------------------------------------------------------------------------------
 */
-public Action:HeadCrabSeekThink(Handle:timer, any:monster)
+public Action:HeadCrabSeekThink(Handle:timer, any:monsterRef)
 {
+	new monster = EntRefToEntIndex(monsterRef);
 	if(IsValidEntity(monster))
 	{
 		new target;
@@ -85,8 +86,8 @@ public Action:HeadCrabSeekThink(Handle:timer, any:monster)
 					BaseNPC_SetAnimation(monster, "canal5b_sewer_jump");
 					
 					new Handle:data = CreateDataPack();
-					WritePackCell(data, monster);
-					WritePackCell(data, target);
+					WritePackCell(data, EntIndexToEntRef(monster));
+					WritePackCell(data, EntIndexToEntRef(target));
 					CreateTimer(0.5, HeadCrabAttachToClient, data);
 					
 					// SetEntityMoveType(target, MOVETYPE_NONE);
@@ -117,9 +118,16 @@ public Action:HeadCrabSeekThink(Handle:timer, any:monster)
 public Action:HeadCrabAttachToClient(Handle:timer, Handle:data)
 {
 	ResetPack(data);
-	new monster = ReadPackCell(data);
-	new target = ReadPackCell(data);
+	new monster = EntRefToEntIndex(ReadPackCell(data));
+	new target = EntRefToEntIndex(ReadPackCell(data));
 	CloseHandle(data);
+	
+	if (!IsValidEntity(monster)) {
+		return;
+	}
+	if (!IsValidEntity(target)) {
+		return;
+	}
 	/*
 	decl String:entIndex[32];
 	IntToString(target, entIndex, sizeof(entIndex)-1);

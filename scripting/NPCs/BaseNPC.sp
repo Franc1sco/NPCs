@@ -71,8 +71,8 @@ stock BaseNPC_Spawn(Float:vEntPosition[3], String:model[128], Timer:func, String
 	SetVariantString(entIndex);
 	AcceptEntityInput(monster_tmp, "SetAttached");
 	
-	CreateTimer(thinkrate, func, monster, TIMER_REPEAT | TIMER_FLAG_NO_MAPCHANGE);
-	CreateTimer(0.01, BaseNPC_Think, monster, TIMER_REPEAT | TIMER_FLAG_NO_MAPCHANGE);
+	CreateTimer(thinkrate, func, EntIndexToEntRef(monster), TIMER_REPEAT | TIMER_FLAG_NO_MAPCHANGE);
+	CreateTimer(0.01, BaseNPC_Think, EntIndexToEntRef(monster), TIMER_REPEAT | TIMER_FLAG_NO_MAPCHANGE);
 	
 	SDKHook(monster, SDKHook_Touch, BaseNPC_Touch);
 	
@@ -135,14 +135,16 @@ stock RemoveEntity(entity, Float:time = 0.0)
 	}
 	else
 	{
-		CreateTimer(time, RemoveEntityTimer, entity, TIMER_FLAG_NO_MAPCHANGE);
+		CreateTimer(time, RemoveEntityTimer, EntIndexToEntRef(entity), TIMER_FLAG_NO_MAPCHANGE);
 	}
 }
 
-public Action:RemoveEntityTimer(Handle:Timer, any:entity)
+public Action:RemoveEntityTimer(Handle:Timer, any:entityRef)
 {
-	if(IsValidEntity(entity))
+	new entity = EntRefToEntIndex(entityRef);
+	if(IsValidEntity(entity)) {
 		AcceptEntityInput(entity, "kill"); // RemoveEdict(entity);
+	}
 	
 	return (Plugin_Stop);
 }
@@ -191,11 +193,13 @@ stock BaseNPC_GetTarget(monster)
 	BaseNPC_Think
 	------------------------------------------------------------------------------------------
 */
-public Action:BaseNPC_Think(Handle:timer, any:monster)
+public Action:BaseNPC_Think(Handle:timer, any:monsterRef)
 {
 	#if defined DEBUG
 		LogMessage("BaseNPC_Think()::START");
 	#endif
+	new monster = EntRefToEntIndex(monsterRef);
+
 	if (BaseNPC_IsNPC(monster))
 	{
 		if (!BaseNPC_IsAlive(monster))
@@ -480,7 +484,7 @@ stock Action:BaseNPC_SetAnimation(monster, String:animation[32], Float:animtime 
 	{
 		new Handle:data = CreateDataPack();
 		CreateTimer(time, BaseNPC_SetAnimation_Timer, data, TIMER_FLAG_NO_MAPCHANGE | TIMER_DATA_HNDL_CLOSE);
-		WritePackCell(data, monster);
+		WritePackCell(data, EntIndexToEntRef(monster));
 		WritePackFloat(data, animtime);
 		WritePackString(data, animation);
 	}
@@ -502,10 +506,11 @@ public Action:BaseNPC_SetAnimation_Timer(Handle:timer, Handle:data)
 	#endif
 	ResetPack(data);
 	
-	new monster = ReadPackCell(data);
+	new monster = EntRefToEntIndex(ReadPackCell(data));
 	new Float:animtime = ReadPackFloat(data);
 	new String:animation[32];
 	ReadPackString(data, animation, sizeof(animation));
+	//CloseHandle(data); using TIMER_DATA_HNDL_CLOSE
 	
 	BaseNPC_SetAnimation(monster, animation, animtime);
 	
@@ -745,7 +750,7 @@ stock BaseNPC_HurtPlayer(monster, target, damage, Float:range = 100.0, Float:vPu
 		
 		new Handle:data = CreateDataPack();
 		CreateTimer(time, BaseNPC_HurtPlayer_Timer, data, TIMER_FLAG_NO_MAPCHANGE | TIMER_DATA_HNDL_CLOSE);
-		WritePackCell(data, monster);
+		WritePackCell(data, EntIndexToEntRef(monster));
 		WritePackCell(data, target);
 		WritePackCell(data, damage);
 		WritePackFloat(data, range);
@@ -763,7 +768,7 @@ stock BaseNPC_HurtPlayer(monster, target, damage, Float:range = 100.0, Float:vPu
 public Action:BaseNPC_HurtPlayer_Timer(Handle:timer, Handle:data)
 {
 	ResetPack(data);
-	new monster = ReadPackCell(data);
+	new monster = EntRefToEntIndex(ReadPackCell(data));
 	new target = ReadPackCell(data);
 	new damage = ReadPackCell(data);
 	new Float:range = ReadPackFloat(data);
@@ -772,6 +777,7 @@ public Action:BaseNPC_HurtPlayer_Timer(Handle:timer, Handle:data)
 	vPunchangle[0] = ReadPackFloat(data);
 	vPunchangle[1] = ReadPackFloat(data);
 	vPunchangle[2] = ReadPackFloat(data);
+	//CloseHandle(data); using TIMER_DATA_HNDL_CLOSE
 	
 	BaseNPC_HurtPlayer(monster, target, damage, range, vPunchangle);
 }
@@ -803,7 +809,7 @@ stock BaseNPC_PlaySound(monster, String:sound[], Float:time = 0.0)
 			
 			new Handle:data = CreateDataPack();
 			CreateTimer(time, BaseNPC_PlaySound_Timer, data, TIMER_FLAG_NO_MAPCHANGE | TIMER_DATA_HNDL_CLOSE);
-			WritePackCell(data, monster);
+			WritePackCell(data, EntIndexToEntRef(monster));
 			WritePackString(data, sound);
 		}
 	}
@@ -822,10 +828,11 @@ public Action:BaseNPC_PlaySound_Timer(Handle:timer, Handle:data)
 {
 	ResetPack(data);
 	
-	new monster = ReadPackCell(data);
+	new monster = EntRefToEntIndex(ReadPackCell(data));
 	new String:sound[32];
 	ReadPackString(data, sound, sizeof(sound));
-	
+	//CloseHandle(data); using TIMER_DATA_HNDL_CLOSE
+
 	BaseNPC_PlaySound(monster, sound);
 }
 

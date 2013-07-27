@@ -35,7 +35,7 @@ public Zombie_Spawn(Float:position[3])
 	
 	SDKHook(monster, SDKHook_OnTakeDamage, ZombieDamageHook);
 	
-	CreateTimer(1.0, ZombieIdleThink, monster, TIMER_FLAG_NO_MAPCHANGE);
+	CreateTimer(1.0, ZombieIdleThink, EntIndexToEntRef(monster), TIMER_FLAG_NO_MAPCHANGE);
 }
 
 /* 
@@ -43,11 +43,12 @@ public Zombie_Spawn(Float:position[3])
 	ZombieAttackThink
 	------------------------------------------------------------------------------------------
 */
-public Action:ZombieThink(Handle:timer, any:monster)
+public Action:ZombieThink(Handle:timer, any:monsterRef)
 {
 	#if defined DEBUG
 		LogMessage("ZombieThink()::START");
 	#endif
+	new monster = EntRefToEntIndex(monsterRef);
 
 	if(BaseNPC_IsNPC(monster) && BaseNPC_IsAlive(monster))
 	{
@@ -178,11 +179,12 @@ public Action:ZombieThink(Handle:timer, any:monster)
 	ZombieIdleThink
 	------------------------------------------------------------------------------------------
 */
-public Action:ZombieIdleThink(Handle:timer, any:monster)
+public Action:ZombieIdleThink(Handle:timer, any:monsterRef)
 {
 	#if defined DEBUG
 		LogMessage("ZombieIdleThink()::START");
 	#endif
+	new monster = EntRefToEntIndex(monsterRef);
 	
 	if(BaseNPC_IsNPC(monster) && BaseNPC_IsAlive(monster))
 	{
@@ -194,7 +196,7 @@ public Action:ZombieIdleThink(Handle:timer, any:monster)
 
 		BaseNPC_PlaySound(monster, soundfile);
 		
-		CreateTimer(GetRandomFloat(1.0, 10.0), ZombieIdleThink, monster, TIMER_FLAG_NO_MAPCHANGE);
+		CreateTimer(GetRandomFloat(1.0, 10.0), ZombieIdleThink, EntIndexToEntRef(monster), TIMER_FLAG_NO_MAPCHANGE);
 		
 		return (Plugin_Continue);
 	}
